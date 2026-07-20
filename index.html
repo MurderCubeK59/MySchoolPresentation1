@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Presentation</title>
+
+<style>
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+body{
+    background:#000;
+    overflow:hidden;
+    font-family:Arial,sans-serif;
+    user-select:none;
+}
+
+#intro{
+    position:fixed;
+    inset:0;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    background:#000;
+    z-index:100;
+}
+
+#introVideo{
+    width:100vw;
+    height:100vh;
+    object-fit:contain;
+    background:#000;
+}
+
+#startOverlay{
+    position:absolute;
+    inset:0;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    background:rgba(0,0,0,.45);
+    color:white;
+    font-size:32px;
+    font-weight:bold;
+    cursor:pointer;
+}
+
+#slideshow{
+    position:fixed;
+    inset:0;
+    display:none;
+    justify-content:center;
+    align-items:center;
+    background:#000;
+}
+
+#slide{
+    width:100%;
+    height:100%;
+    object-fit:contain;
+}
+
+.controls{
+
+    position:absolute;
+
+    bottom:20px;
+
+    width:100%;
+
+    display:flex;
+
+    justify-content:center;
+
+    gap:20px;
+
+}
+
+button{
+
+    padding:15px 30px;
+
+    font-size:20px;
+
+    border:none;
+
+    border-radius:12px;
+
+    cursor:pointer;
+
+}
+
+button:hover{
+    opacity:.9;
+}
+
+.counter{
+
+    position:absolute;
+
+    top:20px;
+
+    left:20px;
+
+    color:white;
+
+    font-size:22px;
+
+    background:rgba(0,0,0,.5);
+
+    padding:10px 16px;
+
+    border-radius:10px;
+
+}
+
+.fadeOut{
+    animation:fadeOut .6s forwards;
+}
+
+.fadeIn{
+    animation:fadeIn .6s forwards;
+}
+
+@keyframes fadeOut{
+    from{opacity:1;}
+    to{opacity:0;}
+}
+
+@keyframes fadeIn{
+    from{opacity:0;}
+    to{opacity:1;}
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div id="intro">
+
+    <video
+        id="introVideo"
+        playsinline
+        preload="auto"
+        disablepictureinpicture
+        controlslist="nodownload nofullscreen noremoteplayback">
+        <source src="intro.mp4" type="video/mp4">
+    </video>
+
+    <div id="startOverlay">
+        Tap Anywhere To Start
+    </div>
+
+</div>
+
+<div id="slideshow">
+
+    <div class="counter" id="counter"></div>
+
+    <img id="slide">
+
+    <div class="controls">
+
+        <button onclick="previousSlide()">◀ Previous</button>
+
+        <button onclick="nextSlide()">Next ▶</button>
+
+    </div>
+
+</div>
+
+<script>
+
+const slides=[
+
+"slides/slide1.png",
+"slides/slide2.png",
+"slides/slide3.png",
+"slides/slide4.png"
+
+];
+
+let current=0;
+
+const slide=document.getElementById("slide");
+const counter=document.getElementById("counter");
+
+function updateSlide(){
+
+    slide.src=slides[current];
+
+    counter.textContent=` / `;
+
+}
+
+updateSlide();
+
+function nextSlide(){
+
+    if(current<slides.length-1){
+
+        current++;
+
+        updateSlide();
+
+    }
+
+}
+
+function previousSlide(){
+
+    if(current>0){
+
+        current--;
+
+        updateSlide();
+
+    }
+
+}
+
+/* Keyboard */
+
+document.addEventListener("keydown",e=>{
+
+    if(e.key==="ArrowRight")
+        nextSlide();
+
+    if(e.key==="ArrowLeft")
+        previousSlide();
+
+});
+
+/* Mobile Swipe */
+
+let startX=0;
+
+document.addEventListener("touchstart",e=>{
+
+    startX=e.touches[0].clientX;
+
+});
+
+document.addEventListener("touchend",e=>{
+
+    let endX=e.changedTouches[0].clientX;
+
+    if(startX-endX>60)
+        nextSlide();
+
+    if(endX-startX>60)
+        previousSlide();
+
+});
+
+/* Intro */
+
+const intro=document.getElementById("intro");
+const introVideo=document.getElementById("introVideo");
+const slideshow=document.getElementById("slideshow");
+const overlay=document.getElementById("startOverlay");
+
+let started=false;
+
+overlay.addEventListener("click",startPresentation);
+overlay.addEventListener("touchstart",startPresentation);
+
+function startPresentation(){
+
+    if(started)return;
+
+    started=true;
+
+    overlay.style.display="none";
+
+    if(document.documentElement.requestFullscreen){
+
+        document.documentElement.requestFullscreen().catch(()=>{});
+
+    }
+
+    introVideo.play();
+
+}
+
+/* Prevent pause */
+
+introVideo.addEventListener("pause",()=>{
+
+    if(!introVideo.ended){
+
+        introVideo.play();
+
+    }
+
+});
+
+/* When video finishes */
+
+introVideo.addEventListener("ended",()=>{
+
+    intro.classList.add("fadeOut");
+
+    setTimeout(()=>{
+
+        intro.style.display="none";
+
+        slideshow.style.display="flex";
+
+        slideshow.classList.add("fadeIn");
+
+    },600);
+
+});
+
+</script>
+
+</body>
+</html>
