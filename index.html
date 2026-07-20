@@ -1,68 +1,296 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
+
 <head>
 
-<title>My Presentations</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Presentation Launcher</title>
+
 
 <style>
 
-body{
-    background:#111;
-    color:white;
-    font-family:Arial;
-    text-align:center;
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
 }
+
+
+body{
+
+    background:black;
+    color:white;
+
+    font-family:Arial, sans-serif;
+
+    overflow:hidden;
+
+}
+
+
+/* INTRO VIDEO */
+
+#intro{
+
+    position:fixed;
+
+    inset:0;
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    background:black;
+
+}
+
+
+#introVideo{
+
+    width:100vw;
+
+    height:100vh;
+
+    object-fit:contain;
+
+}
+
+
+
+/* MENU */
+
+
+#menu{
+
+    display:none;
+
+    height:100vh;
+
+    justify-content:center;
+
+    align-items:center;
+
+    flex-direction:column;
+
+    text-align:center;
+
+}
+
+
+
+h1{
+
+    font-size:50px;
+
+    margin-bottom:40px;
+
+}
+
+
 
 button{
 
-    padding:20px 40px;
-    margin:20px;
+    width:300px;
 
-    font-size:22px;
+    padding:20px;
 
-    border-radius:10px;
+    margin:15px;
+
+    font-size:25px;
+
+    border:none;
+
+    border-radius:15px;
+
     cursor:pointer;
 
 }
 
+
+button:active{
+
+    transform:scale(0.95);
+
+}
+
+
+
 </style>
 
+
 </head>
+
 
 <body>
 
 
+<!-- INTRO -->
+
+<div id="intro">
+
+
+<video
+id="introVideo"
+playsinline
+disablepictureinpicture
+controlslist="nodownload nofullscreen noremoteplayback">
+
+
+<source src="launcher/intro.mp4" type="video/mp4">
+
+
+</video>
+
+
+</div>
+
+
+
+
+<!-- MENU -->
+
+<div id="menu">
+
+
 <h1>
-My Presentations
+Choose Presentation
 </h1>
 
 
-<button onclick="openPres('presentation1.html')">
-Presentation 1
+
+<button onclick="openPresentation('presentations/History/index.html')">
+
+History
+
 </button>
 
 
-<button onclick="openPres('presentation2.html')">
-Presentation 2
+
+<button onclick="openPresentation('presentations/Science/index.html')">
+
+Science
+
 </button>
 
 
-<button onclick="openPres('presentation3.html')">
-Presentation 3
+
+<button onclick="openPresentation('presentations/Math/index.html')">
+
+Math
+
 </button>
+
+
+
+</div>
+
+
 
 
 
 <script>
 
-function openPres(page){
+
+const video = document.getElementById("introVideo");
+
+const intro = document.getElementById("intro");
+
+const menu = document.getElementById("menu");
+
+
+
+let started = false;
+
+
+
+/*
+Browsers block autoplay with sound.
+User needs one interaction.
+*/
+
+document.addEventListener("click",startVideo,{once:true});
+
+document.addEventListener("touchstart",startVideo,{once:true});
+
+
+
+function startVideo(){
+
+
+    if(started)
+        return;
+
+
+    started=true;
+
+
+    video.play();
+
+
+}
+
+
+
+
+
+/*
+Prevent pausing
+*/
+
+video.addEventListener("pause",()=>{
+
+
+    if(!video.ended){
+
+        video.play();
+
+    }
+
+
+});
+
+
+
+
+
+/*
+When intro finishes
+*/
+
+
+video.addEventListener("ended",()=>{
+
+
+    intro.style.display="none";
+
+
+    menu.style.display="flex";
+
+
+});
+
+
+
+
+
+
+function openPresentation(page){
+
 
     window.location.href = page;
 
+
 }
+
+
 
 </script>
 
 
 </body>
+
 </html>
