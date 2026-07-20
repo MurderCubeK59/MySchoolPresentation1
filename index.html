@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Presentation Launcher</title>
+
+
+<style>
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+
+body{
+
+    background:black;
+    color:white;
+
+    font-family:Arial, sans-serif;
+
+    overflow:hidden;
+
+}
+
+
+/* INTRO VIDEO */
+
+#intro{
+
+    position:fixed;
+
+    inset:0;
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    background:black;
+
+}
+
+
+#introVideo{
+
+    width:100vw;
+
+    height:100vh;
+
+    object-fit:contain;
+
+}
+
+
+/* CLICK TEXT */
+
+#startText{
+
+    position:absolute;
+
+    color:white;
+
+    font-size:32px;
+
+    font-weight:bold;
+
+    text-align:center;
+
+    background:rgba(0,0,0,0.5);
+
+    padding:20px 35px;
+
+    border-radius:15px;
+
+    cursor:pointer;
+
+}
+
+
+
+/* MENU */
+
+
+#menu{
+
+    display:none;
+
+    height:100vh;
+
+    justify-content:center;
+
+    align-items:center;
+
+    flex-direction:column;
+
+    text-align:center;
+
+}
+
+
+
+h1{
+
+    font-size:50px;
+
+    margin-bottom:40px;
+
+}
+
+
+
+button{
+
+    width:300px;
+
+    padding:20px;
+
+    margin:15px;
+
+    font-size:25px;
+
+    border:none;
+
+    border-radius:15px;
+
+    cursor:pointer;
+
+}
+
+
+button:active{
+
+    transform:scale(0.95);
+
+}
+
+
+
+</style>
+
+
+</head>
+
+
+<body>
+
+
+<!-- INTRO -->
+
+<div id="intro">
+
+
+<video
+id="introVideo"
+playsinline
+disablepictureinpicture
+controlslist="nodownload nofullscreen noremoteplayback">
+
+
+<source src="launcher/intro.mp4" type="video/mp4">
+
+
+</video>
+
+
+
+<div id="startText">
+
+Click Anywhere To Start
+
+</div>
+
+
+</div>
+
+
+
+
+<!-- MENU -->
+
+<div id="menu">
+
+
+<h1>
+Choose Presentation
+</h1>
+
+
+
+<button onclick="openPresentation('presentations/History/index.html')">
+
+History
+
+</button>
+
+
+
+<button onclick="openPresentation('presentations/Science/index.html')">
+
+Science
+
+</button>
+
+
+
+<button onclick="openPresentation('presentations/Math/index.html')">
+
+Math
+
+</button>
+
+
+
+</div>
+
+
+
+
+
+<script>
+
+
+const video = document.getElementById("introVideo");
+
+const intro = document.getElementById("intro");
+
+const menu = document.getElementById("menu");
+
+const startText = document.getElementById("startText");
+
+
+
+let started = false;
+
+
+
+// Click anywhere to start
+
+intro.addEventListener("click",startVideo);
+
+intro.addEventListener("touchstart",startVideo);
+
+
+
+function startVideo(){
+
+
+    if(started)
+        return;
+
+
+    started=true;
+
+
+    startText.style.display="none";
+
+
+    video.play();
+
+
+}
+
+
+
+
+
+// Prevent pausing
+
+video.addEventListener("pause",()=>{
+
+
+    if(!video.ended){
+
+        video.play();
+
+    }
+
+
+});
+
+
+
+
+
+// After video ends
+
+video.addEventListener("ended",()=>{
+
+
+    intro.style.display="none";
+
+
+    menu.style.display="flex";
+
+
+});
+
+
+
+
+
+
+function openPresentation(page){
+
+
+    window.location.href = page;
+
+
+}
+
+
+
+</script>
+
+
+</body>
+
+</html>
