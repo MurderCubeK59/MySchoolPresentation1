@@ -60,6 +60,31 @@ body{
 }
 
 
+/* CLICK TEXT */
+
+#startText{
+
+    position:absolute;
+
+    color:white;
+
+    font-size:32px;
+
+    font-weight:bold;
+
+    text-align:center;
+
+    background:rgba(0,0,0,0.5);
+
+    padding:20px 35px;
+
+    border-radius:15px;
+
+    cursor:pointer;
+
+}
+
+
 
 /* MENU */
 
@@ -146,6 +171,14 @@ controlslist="nodownload nofullscreen noremoteplayback">
 </video>
 
 
+
+<div id="startText">
+
+Click Anywhere To Start
+
+</div>
+
+
 </div>
 
 
@@ -201,20 +234,19 @@ const intro = document.getElementById("intro");
 
 const menu = document.getElementById("menu");
 
+const startText = document.getElementById("startText");
+
 
 
 let started = false;
 
 
 
-/*
-Browsers block autoplay with sound.
-User needs one interaction.
-*/
+// Click anywhere to start
 
-document.addEventListener("click",startVideo,{once:true});
+intro.addEventListener("click",startVideo);
 
-document.addEventListener("touchstart",startVideo,{once:true});
+intro.addEventListener("touchstart",startVideo);
 
 
 
@@ -228,6 +260,9 @@ function startVideo(){
     started=true;
 
 
+    startText.style.display="none";
+
+
     video.play();
 
 
@@ -237,9 +272,7 @@ function startVideo(){
 
 
 
-/*
-Prevent pausing
-*/
+// Prevent pausing
 
 video.addEventListener("pause",()=>{
 
@@ -257,10 +290,7 @@ video.addEventListener("pause",()=>{
 
 
 
-/*
-When intro finishes
-*/
-
+// After video ends
 
 video.addEventListener("ended",()=>{
 
