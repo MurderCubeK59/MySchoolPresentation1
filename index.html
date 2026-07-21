@@ -1,354 +1,68 @@
 <!DOCTYPE html>
-<html lang="en">
-
-<head>
-
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>Presentation Launcher</title>
-
-
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Presentation Hub</title>
 <style>
-
-*{
-    margin:0;
-    padding:0;
-    box-sizing:border-box;
-}
-
-
-body{
-
-    background:black;
-    color:white;
-
-    font-family:Arial, sans-serif;
-
-    overflow:hidden;
-
-}
-
-
-/* INTRO VIDEO */
-
-#intro{
-
-    position:fixed;
-
-    inset:0;
-
-    display:flex;
-
-    justify-content:center;
-
-    align-items:center;
-
-    background:black;
-
-}
-
-
-#introVideo{
-
-    width:100vw;
-
-    height:100vh;
-
-    object-fit:contain;
-
-}
-
-
-/* CLICK TEXT */
-
-#startText{
-
-    position:absolute;
-
-    color:white;
-
-    font-size:32px;
-
-    font-weight:bold;
-
-    text-align:center;
-
-    background:rgba(0,0,0,0.5);
-
-    padding:20px 35px;
-
-    border-radius:15px;
-
-    cursor:pointer;
-
-}
-
-
-
-/* MENU */
-
-
-#menu{
-
-    display:none;
-
-    height:100vh;
-
-    justify-content:center;
-
-    align-items:center;
-
-    flex-direction:column;
-
-    text-align:center;
-
-}
-
-
-
-h1{
-
-    font-size:50px;
-
-    margin-bottom:40px;
-
-}
-
-
-
-button{
-
-    width:300px;
-
-    padding:20px;
-
-    margin:15px;
-
-    font-size:25px;
-
-    border:none;
-
-    border-radius:15px;
-
-    cursor:pointer;
-
-}
-
-
-button:active{
-
-    transform:scale(0.95);
-
-}
-
-
-
-</style>
-
-
-</head>
-
-
+*{box-sizing:border-box;margin:0;padding:0}body{background:#000;color:#fff;font-family:Arial;overflow:hidden}
+.screen{position:fixed;inset:0;display:none;justify-content:center;align-items:center;background:#000}
+#intro,#player,#menu{display:flex}
+video,img{width:100vw;height:100vh;object-fit:contain;background:#000}
+#overlay{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.35);font-size:2rem;font-weight:bold;cursor:pointer}
+#menu{flex-direction:column;gap:15px}
+button{padding:15px 30px;font-size:20px;border-radius:10px;border:none;cursor:pointer}
+#controls{position:absolute;bottom:20px;left:50%;transform:translateX(-50%);display:none;gap:10px}
+</style></head>
 <body>
+<div id="intro" class="screen">
+<video id="video" playsinline disablepictureinpicture controlslist="nodownload nofullscreen noremoteplayback"></video>
+<div id="overlay">Click Anywhere To Start</div>
+</div>
 
+<div id="menu" class="screen">
+<h1>Choose Presentation</h1>
+<button onclick="startPresentation('history')">History</button>
+<button onclick="startPresentation('science')">Science</button>
+</div>
 
-<!-- INTRO -->
-
-<div id="intro">
-
-
-<video
-id="introVideo"
-playsinline
-disablepictureinpicture
-controlslist="nodownload nofullscreen noremoteplayback">
-
-
-<source src="launcher/intro.mp4" type="video/mp4">
-
-
-</video>
+<div id="player" class="screen" style="display:none">
+<img id="slide">
+<div id="controls">
+<button onclick="prev()">◀ Previous</button>
+<button onclick="home()">🏠 Home</button>
+<button onclick="next()">Next ▶</button>
+</div>
+</div>
 
 <audio id="bgm" src="launcher/bgm.mp3" loop></audio>
 
-
-
-<div id="startText">
-
-Click Anywhere To Start
-
-</div>
-
-
-</div>
-
-
-
-
-<!-- MENU -->
-
-<div id="menu">
-
-
-<h1>
-Choose Presentation
-</h1>
-
-
-
-<button onclick="openPresentation('presentations/History/index.html')">
-
-History
-
-</button>
-
-
-
-<button onclick="openPresentation('presentations/Science/index.html')">
-
-Science
-
-</button>
-
-
-
-<button onclick="openPresentation('presentations/Math/index.html')">
-
-Math
-
-</button>
-
-
-
-</div>
-
-
-
-
-
 <script>
-
-
-const video = document.getElementById("introVideo");
-
-const intro = document.getElementById("intro");
-
-const menu = document.getElementById("menu");
-
-const startText = document.getElementById("startText");
-
-const bgm = document.getElementById("bgm");
-
-
-
-let started = false;
-
-
-
-// Click anywhere to start
-
-intro.addEventListener("click",startVideo);
-
-intro.addEventListener("touchstart",startVideo);
-
-
-
-function startVideo(){
-
-
-    if(started)
-        return;
-
-
-    started=true;
-
-
-    startText.style.display="none";
-
-
-    video.play();
-
-
+const presentations={
+ history:{intro:"presentations/history/intro.mp4",slides:[
+"presentations/history/slides/1.png",
+"presentations/history/slides/2.png",
+"presentations/history/slides/3.png"]},
+ science:{intro:"presentations/science/intro.mp4",slides:[
+"presentations/science/slides/1.png",
+"presentations/science/slides/2.png"]}
+};
+const launcherIntro="launcher/intro.mp4";
+let mode="launcher",currentPres=null,idx=0,startX=0;
+const intro=document.getElementById("intro"),menu=document.getElementById("menu"),player=document.getElementById("player"),video=document.getElementById("video"),overlay=document.getElementById("overlay"),slide=document.getElementById("slide"),controls=document.getElementById("controls"),bgm=document.getElementById("bgm");
+function showIntro(src){intro.style.display="flex";menu.style.display="none";player.style.display="none";controls.style.display="none";overlay.style.display="flex";video.src=src;video.load();}
+showIntro(launcherIntro);
+overlay.onclick=()=>{overlay.style.display="none";video.play();}
+video.onpause=()=>{if(!video.ended)video.play();}
+video.onended=()=>{
+ intro.style.display="none";
+ if(mode==="launcher"){menu.style.display="flex";bgm.play().catch(()=>{});}
+ else{player.style.display="flex";controls.style.display="flex";idx=0;update();}
 }
-
-
-
-
-
-// Prevent pausing
-
-video.addEventListener("pause",()=>{
-
-
-    if(!video.ended){
-
-        video.play();
-
-    }
-
-
-});
-
-
-
-
-
-// After video ends
-
-video.addEventListener("ended",()=>{
-
-
-    intro.style.display="none";
-
-
-    menu.style.display="flex";
-
-
-    // Start background music
-
-    bgm.volume = 0;
-    bgm.play();
-
-    let volume = 0;
-
-    let fade = setInterval(()=>{
-
-    if(volume < 0.5){
-
-        volume += 0.02;
-
-        bgm.volume = volume;
-
-    }
-    else{
-
-        clearInterval(fade);
-
-    }
-
-    },100);
-
-});
-
-
-
-
-
-
-function openPresentation(page){
-
-
-    window.location.href = page;
-
-
-}
-
-
-
+function startPresentation(id){bgm.pause();mode="presentation";currentPres=id;showIntro(presentations[id].intro);}
+function update(){slide.src=presentations[currentPres].slides[idx]}
+function next(){if(idx<presentations[currentPres].slides.length-1){idx++;update();}}
+function prev(){if(idx>0){idx--;update();}}
+function home(){mode="launcher";showIntro(launcherIntro);}
+document.addEventListener("keydown",e=>{if(player.style.display!=="none"){if(e.key==="ArrowRight")next();if(e.key==="ArrowLeft")prev();}});
+document.addEventListener("touchstart",e=>startX=e.touches[0].clientX);
+document.addEventListener("touchend",e=>{if(player.style.display==="none")return;let d=e.changedTouches[0].clientX-startX;if(d>50)prev();if(d<-50)next();});
 </script>
-
-
-</body>
-
-</html>
+</body></html>
